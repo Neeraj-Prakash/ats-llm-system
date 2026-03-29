@@ -1,5 +1,5 @@
 import re
-
+from tqdm import tqdm
 
 def basic_clean(text: str) -> str:
     """
@@ -66,7 +66,7 @@ def clean_resume_text(text: str) -> str:
 def clean_all_resumes(resume_data: list[dict[str, any]]) -> list[dict[str, any]]:
     # Iterate over each resume and apply the cleaning function
     cleaned_data = []
-    for resume in resume_data:
+    for resume in tqdm(resume_data):
         cleaned_resume = clean_resume_text(resume["resume_text"])
         resume["cleaned_text"] = cleaned_resume
         cleaned_data.append(resume)

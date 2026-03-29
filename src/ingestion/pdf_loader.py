@@ -1,7 +1,7 @@
 import os
 import pdfplumber
 from typing import List, Dict
-
+from tqdm import tqdm
 
 def extract_text_from_pdf(file_path: str) -> str:
     """
@@ -38,8 +38,6 @@ def get_all_pdf_paths(root_dir: str) -> List[str]:
                 pdf_paths.append(os.path.join(root, file))
 
     print(f"Found {len(pdf_paths)} PDF files in directories:")
-    for i, path in enumerate(pdf_paths[:5]):
-        print(f"  {i+1}. {path}")
 
     return pdf_paths
 
@@ -58,10 +56,8 @@ def extract_all_resumes(root_dir: str) -> List[Dict]:
 
     print(f"\nProcessing {len(pdf_paths)} PDF files...")
 
-    for idx, pdf_path in enumerate(pdf_paths):
+    for idx, pdf_path in tqdm(enumerate(pdf_paths), total=len(pdf_paths)):
         try:
-            print(f"[{idx+1}/{len(pdf_paths)}] Processing: {pdf_path}")
-
             # Check if file exists before processing
             if not os.path.exists(pdf_path):
                 print(f"  Skipping: File not found at {pdf_path}")
