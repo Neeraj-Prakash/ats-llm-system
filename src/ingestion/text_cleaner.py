@@ -1,6 +1,7 @@
 import re
 from tqdm import tqdm
 
+
 def basic_clean(text: str) -> str:
     """
     Basic cleaning:

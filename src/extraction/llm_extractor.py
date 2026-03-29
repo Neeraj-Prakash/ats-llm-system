@@ -91,7 +91,7 @@ def extract_with_llm(resume_text: str):
         )
 
     decoded = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    decoded = decoded[len(prompt):]
+    decoded = decoded[len(prompt) :]
 
     return safe_json_extract(decoded)
 
@@ -113,7 +113,6 @@ def validate_extracted_data(data: dict[str, any]) -> dict[str, any]:
     if not isinstance(data.get("total_experience"), (int, float)):
         data["total_experience"] = 0
 
-
     return data
 
 
@@ -123,7 +122,7 @@ def summarize_all_resumes(resume_data: list[dict[str, any]]) -> dict[str, any]:
     """
     summarized_data = []
     for resume in tqdm(resume_data):
-        structured = extract_with_llm(resume['cleaned_text'])
+        structured = extract_with_llm(resume["cleaned_text"])
         structured = validate_extracted_data(structured)
         resume.update(structured)
         summarized_data.append(resume)

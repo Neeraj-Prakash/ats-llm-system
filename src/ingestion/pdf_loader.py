@@ -3,6 +3,7 @@ import pdfplumber
 from typing import List, Dict
 from tqdm import tqdm
 
+
 def extract_text_from_pdf(file_path: str) -> str:
     """
     Extract text from a single PDF file.
