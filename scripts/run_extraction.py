@@ -21,10 +21,10 @@ def save_to_json(data, output_path):
 
 if __name__ == "__main__":
     # Path to your dataset
-    ROOT_DIR = "ats-llm-system/data/raw/resumes/data"
+    ROOT_DIR = "data/raw/resumes/data"
 
     # Output file
-    OUTPUT_PATH = "ats-llm-system/data/interim/extracted_text/resumes_text.json"
+    OUTPUT_PATH = "data/interim/extracted_text/resumes_text.json"
 
     print("Starting PDF extraction pipeline...")
 
