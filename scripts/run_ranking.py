@@ -14,6 +14,7 @@ from src.embeddings.embedder import generate_embeddings
 
 CANDIDATES_PATH = "data/processed/candidates.json"
 INDEX_PATH = "data/embeddings/faiss.index"
+JOB_PATH = "data/raw/jobs/em_01.txt"
 
 
 def load_json(path):
@@ -21,14 +22,17 @@ def load_json(path):
         return json.load(f)
 
 
+def read_job_description(path):
+    with open(path, "r") as f:
+        return f.read().strip()
+
+
 if __name__ == "__main__":
     candidates = load_json(CANDIDATES_PATH)
 
     index = faiss.read_index(INDEX_PATH)
 
-    job_description = """
-    FOX Corporation is looking for an experienced Engineering Manager to lead our web engineering team responsible for building high-quality, scalable, and reliable web applications. You will be responsible for building, mentoring, and scaling a high-performing team while driving technical excellence and delivery of world-class web experiences.
-    """
+    job_description = read_job_description(JOB_PATH)
 
     query_embedding = generate_embeddings(job_description, is_query=True)
     query_embedding = query_embedding.reshape(1, -1)
