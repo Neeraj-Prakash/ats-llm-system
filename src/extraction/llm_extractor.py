@@ -29,20 +29,23 @@ def build_prompt(resume_text: str) -> str:
 You are an expert resume parser.
 
 Extract the following fields from the resume:
-- skills (list)
+- skills (list of strings)
 - total_experience (years - calculate from past roles, number)
-- education (list containing {'degree', 'university', 'gpa'})
+- education (list containing {'degree', 'university'})
 - current_role (string)
-- past_roles (list containing {'role', 'company', 'summary'})
+- past_roles (list containing {'role', 'summary'})
 
 Ensure that the extracted data is in valid JSON format. If any data is missing or incorrect, return it as an empty array or string.
 Rules:
-- max 20 skills
-- max 5 past roles
-- short past role entries
+- Limit the number of skills to a maximum of 20.
+- Limit the number of past roles to a maximum of 5.
+- Keep past role summaries concise.
 
 Resume:
 {resume_text}
+
+JSON Output:
+```json
 """
 
 
