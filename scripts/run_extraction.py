@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     print("Starting PDF extraction pipeline...")
 
-    dataset = extract_all_resumes(ROOT_DIR)[:3]
+    dataset = extract_all_resumes(ROOT_DIR)
     print(f"Extracted {len(dataset)} resumes from PDFs.")
 
     print("Starting text cleaning pipeline...")
