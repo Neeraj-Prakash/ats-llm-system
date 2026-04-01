@@ -10,6 +10,8 @@ project_root = os.path.dirname(current_dir)  # Navigate to 'ats-llm-system' dire
 sys.path.append(project_root)
 
 from src.embeddings.embedder import generate_embeddings
+from src.ranking.ranker import rerank_candidates
+from src.extraction.llm_extractor import model, tokenizer
 
 
 CANDIDATES_PATH = "data/processed/candidates.json"
@@ -38,13 +40,23 @@ if __name__ == "__main__":
     query_embedding = query_embedding.reshape(1, -1)
     faiss.normalize_L2(query_embedding)
 
-    distances, indices = index.search(query_embedding, k=5)
+    distances, indices = index.search(query_embedding, k=10)
+    top_candidates = [candidates[i] for i in indices[0]]
 
-    print("\nTop Matches:\n")
+    reranked = rerank_candidates(model, tokenizer, job_description, top_candidates)
 
-    for i, idx in enumerate(indices[0]):
-        print(f"Rank {i+1}")
-        print(f"Candidate ID: {candidates[idx]['candidate_id']}")
-        print(f"Skills: {candidates[idx]['skills']}")
-        print(f"Distance: {distances[0][i]}")
+    ranking = reranked.get("ranking", [])
+
+    final_results = sorted(ranking, key=lambda x: x["score"], reverse=True)
+
+    print("\nFinal Ranked Candidates:\n")
+
+    for r in final_results:
+        idx = r["candidate_index"] - 1
+        candidate = top_candidates[idx]
+        faiss_score = distances[0][idx]
+
+        print(f"Candidate ID: {candidate['candidate_id']}")
+        print(f"LLM Score: {r['score']}")
+        print(f"FAISS Score: {np.round(faiss_score, 3)}")
         print("-" * 40)
