@@ -47,16 +47,27 @@ if __name__ == "__main__":
 
     ranking = reranked.get("ranking", [])
 
-    final_results = sorted(ranking, key=lambda x: x["score"], reverse=True)
-
-    print("\nFinal Ranked Candidates:\n")
-
-    for r in final_results:
+    results = []
+    for r in ranking:
         idx = r["candidate_index"] - 1
         candidate = top_candidates[idx]
         faiss_score = distances[0][idx]
+        normalized_faiss = (faiss_score + 1) / 2
+        weighted_score = 0.7 * normalized_faiss + 0.3 * (r["score"] / 10)
+        results.append(
+            {
+                "candidate_id": candidate["candidate_id"],
+                "faiss_score": faiss_score,
+                "llm_score": r["score"],
+                "weighted_score": weighted_score,
+            }
+        )
+    results.sort(key=lambda x: x["weighted_score"], reverse=True)
 
-        print(f"Candidate ID: {candidate['candidate_id']}")
-        print(f"LLM Score: {r['score']}")
-        print(f"FAISS Score: {np.round(faiss_score, 3)}")
+    print("\nTop 5 Candidates Based on Weighted Score:\n")
+    for r in results[:5]:
+        print(f"Candidate ID: {r['candidate_id']}")
+        print(f"FAISS Score: {r['faiss_score']:.4f}")
+        print(f"LLM Score: {r['llm_score']:.4f}")
+        print(f"Final Score: {r['weighted_score']:.4f}")
         print("-" * 40)
