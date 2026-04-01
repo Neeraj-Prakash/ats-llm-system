@@ -8,6 +8,7 @@ project_root = os.path.dirname(current_dir)  # Navigate to 'ats-llm-system' dire
 sys.path.append(project_root)
 from src.embeddings.embedder import build_candidate_text
 
+
 def build_rerank_prompt(job_desc, candidates):
     prompt = f"""
 You are an expert recruiter.
@@ -74,7 +75,7 @@ def rerank_candidates(model, tokenizer, job_desc, candidates):
     decoded = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
     decoded = decoded[len(prompt) :]
-    
+
     result = safe_json_extract(decoded)
 
     return result
