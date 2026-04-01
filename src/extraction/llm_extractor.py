@@ -9,7 +9,7 @@ from transformers import AutoTokenizer
 
 MODEL_NAME = "unsloth/mistral-7b-instruct-v0.3-bnb-4bit"
 
-max_seq_length = 2048
+max_seq_length = 5012
 dtype = None  # auto
 load_in_4bit = True
 
