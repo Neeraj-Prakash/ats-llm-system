@@ -74,6 +74,7 @@ def clean_all_resumes(resume_data: list[dict[str, any]]) -> list[dict[str, any]]
 
     return cleaned_data
 
+
 def clean_all_jds(jd_data: list[dict[str, any]]) -> list[dict[str, any]]:
     # Iterate over each JD and apply the cleaning function
     cleaned_data = []
@@ -83,4 +84,3 @@ def clean_all_jds(jd_data: list[dict[str, any]]) -> list[dict[str, any]]:
         cleaned_data.append(jd)
 
     return cleaned_data
-

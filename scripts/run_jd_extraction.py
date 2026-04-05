@@ -11,11 +11,13 @@ sys.path.append(project_root)
 from src.ingestion.text_loader import extract_all_jobs
 from src.ingestion.text_cleaner import clean_all_jds
 
+
 def save_to_json(data, output_path):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
+
 
 if __name__ == "__main__":
     # Path to your dataset
@@ -32,7 +34,6 @@ if __name__ == "__main__":
     print("Starting text cleaning pipeline...")
     cleaned_dataset = clean_all_jds(dataset)
     print(f"Cleaned {len(cleaned_dataset)} resumes from PDFs.")
-
 
     print(f"Saving {len(cleaned_dataset)} records...")
 
