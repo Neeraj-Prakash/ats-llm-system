@@ -65,10 +65,9 @@ def safe_json_extract(text: str):
     Extract JSON block from model output
     """
     try:
-        match = re.search(r"\{.*\}", text, re.DOTALL)
-        if match:
-            json_str = match.group(0)
-            return json.loads(json_str)
+        json_str = re.findall(r"\{.*?\}", text, re.DOTALL)
+        if json_str:
+            return json.loads(json_str[0])
         else:
             raise ValueError("No JSON found")
 
