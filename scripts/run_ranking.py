@@ -11,6 +11,7 @@ sys.path.append(project_root)
 
 from src.ranking.ranker import rerank_candidates
 from src.utils.helpers import sort_candidates
+from src.utils.model_loader import get_model
 
 
 CANDIDATES_PATH = "data/processed/candidates.json"
@@ -27,12 +28,13 @@ if __name__ == "__main__":
     candidates = load_json(CANDIDATES_PATH)
     index = faiss.read_index(INDEX_PATH)
     jobs = load_json(JOB_PATH)
+    model, tokenizer = get_model(seq_length=5120)
     job_id = 0
 
     job_description = jobs[job_id]["cleaned_text"]
 
     top_candidates, distances, ranking = rerank_candidates(
-        job_description, candidates, index
+        job_description, candidates, index, model, tokenizer
     )
 
     results = sort_candidates(

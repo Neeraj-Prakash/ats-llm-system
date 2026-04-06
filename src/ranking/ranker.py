@@ -9,7 +9,6 @@ project_root = os.path.dirname(current_dir)  # Navigate to 'ats-llm-system' dire
 sys.path.append(project_root)
 from src.embeddings.embedder import build_candidate_text
 from src.embeddings.embedder import generate_embeddings
-from src.extraction.llm_extractor import model, tokenizer
 
 
 def build_rerank_prompt(job_desc, candidates):
@@ -72,7 +71,7 @@ def get_llm_ranking(model, tokenizer, job_desc, candidates):
 
     with torch.no_grad():
         outputs = model.generate(
-            **inputs, max_new_tokens=600, temperature=0.1, do_sample=False
+            **inputs, max_new_tokens=600, temperature=0.3, do_sample=False
         )
 
     decoded = tokenizer.decode(outputs[0], skip_special_tokens=True)
@@ -80,11 +79,12 @@ def get_llm_ranking(model, tokenizer, job_desc, candidates):
     decoded = decoded[len(prompt) :]
 
     result = safe_json_extract(decoded)
-
+    torch.cuda.empty_cache()
+    del inputs, outputs
     return result
 
 
-def rerank_candidates(job_description, candidates, index):
+def rerank_candidates(job_description, candidates, index, model, tokenizer):
     query_embedding = generate_embeddings(job_description, is_query=True)
     query_embedding = query_embedding.reshape(1, -1)
     faiss.normalize_L2(query_embedding)
