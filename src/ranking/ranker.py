@@ -1,12 +1,15 @@
 import torch
 import os
 import sys
+import faiss
 
 # Add the root directory (ats-llm-system) to sys.path
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)  # Navigate to 'ats-llm-system' directory
 sys.path.append(project_root)
 from src.embeddings.embedder import build_candidate_text
+from src.embeddings.embedder import generate_embeddings
+from src.extraction.llm_extractor import model, tokenizer
 
 
 def build_rerank_prompt(job_desc, candidates):
@@ -60,7 +63,7 @@ def safe_json_extract(text: str):
     return {"ranking": []}
 
 
-def rerank_candidates(model, tokenizer, job_desc, candidates):
+def get_llm_ranking(model, tokenizer, job_desc, candidates):
     prompt = build_rerank_prompt(job_desc, candidates)
 
     inputs = tokenizer(
@@ -79,3 +82,16 @@ def rerank_candidates(model, tokenizer, job_desc, candidates):
     result = safe_json_extract(decoded)
 
     return result
+
+def rerank_candidates(job_description, candidates, index):
+    query_embedding = generate_embeddings(job_description, is_query=True)
+    query_embedding = query_embedding.reshape(1, -1)
+    faiss.normalize_L2(query_embedding)
+
+    distances, indices = index.search(query_embedding, k=10)
+    top_candidates = [candidates[i] for i in indices[0]]
+
+    llm_ranking = get_llm_ranking(model, tokenizer, job_description, top_candidates)
+
+    ranking = llm_ranking.get("ranking", [])
+    return top_candidates, distances, ranking
