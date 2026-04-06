@@ -10,6 +10,7 @@ sys.path.append(project_root)
 from src.evaluation.evaluator import evaluate_ranking
 from src.ranking.ranker import rerank_candidates
 from src.utils.helpers import sort_candidates
+from src.utils.model_loader import get_model
 
 CANDIDATES_PATH = "data/processed/candidates.json"
 INDEX_PATH = "data/embeddings/faiss.index"
@@ -27,16 +28,17 @@ if __name__ == "__main__":
     index = faiss.read_index(INDEX_PATH)
     jobs = load_json(JOB_PATH)
     labels_data = load_json(LABELS_PATH)
+    model, tokenizer = get_model(seq_length=5120)
 
     all_results = []
 
-    for job_entry in jobs[:1]:
+    for job_entry in jobs:
         job_description = job_entry["cleaned_text"]
         job_id = job_entry["job_id"]
         true_labels = labels_data[job_id]["labels"]
 
         top_candidates, distances, ranking = rerank_candidates(
-            job_description, candidates, index
+            job_description, candidates, index, model, tokenizer
         )
         predicted = sort_candidates(
             top_candidates, distances, ranking, sort_key="llm_score"

@@ -7,23 +7,6 @@ from unsloth import FastLanguageModel
 from transformers import AutoTokenizer
 
 
-MODEL_NAME = "unsloth/mistral-7b-instruct-v0.3-bnb-4bit"
-
-max_seq_length = 5012
-dtype = None  # auto
-load_in_4bit = True
-
-model, tokenizer = FastLanguageModel.from_pretrained(
-    model_name=MODEL_NAME,
-    max_seq_length=max_seq_length,
-    dtype=dtype,
-    load_in_4bit=load_in_4bit,
-)
-
-FastLanguageModel.for_inference(model)
-print("✅ Model loaded successfully!")
-
-
 def build_prompt(resume_text: str) -> str:
     return f"""
 You are an expert resume parser.
@@ -76,7 +59,7 @@ def safe_json_extract(text: str):
         return get_empty_schema()
 
 
-def extract_with_llm(resume_text: str):
+def extract_with_llm(resume_text: str, model, tokenizer):
     """
     Extract data from the model's response using a prompt.
     """
@@ -94,7 +77,7 @@ def extract_with_llm(resume_text: str):
 
     decoded = tokenizer.decode(outputs[0], skip_special_tokens=True)
     decoded = decoded[len(prompt) :]
-
+    torch.cuda.empty_cache()
     return safe_json_extract(decoded)
 
 
@@ -118,13 +101,15 @@ def validate_extracted_data(data: dict[str, any]) -> dict[str, any]:
     return data
 
 
-def summarize_all_resumes(resume_data: list[dict[str, any]]) -> dict[str, any]:
+def summarize_all_resumes(
+    resume_data: list[dict[str, any]], model, tokenizer
+) -> dict[str, any]:
     """
     Summarize all resumes
     """
     summarized_data = []
     for resume in tqdm(resume_data):
-        structured = extract_with_llm(resume["cleaned_text"])
+        structured = extract_with_llm(resume["cleaned_text"], model, tokenizer)
         structured = validate_extracted_data(structured)
         resume.update(structured)
         summarized_data.append(resume)
