@@ -83,6 +83,7 @@ def get_llm_ranking(model, tokenizer, job_desc, candidates):
 
     return result
 
+
 def rerank_candidates(job_description, candidates, index):
     query_embedding = generate_embeddings(job_description, is_query=True)
     query_embedding = query_embedding.reshape(1, -1)
